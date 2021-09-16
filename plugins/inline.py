@@ -64,7 +64,7 @@ async def search(client, query):
                     title=v["title"],
                     description=("Duration: {} Views: {}").format(
                         v["duration"],
-                        v["viewCount"]["short"]
+                        v["viewCount"]
                     ),
                     input_message_content=InputTextMessageContent(
                         "/stream https://www.youtube.com/watch?v={}".format(

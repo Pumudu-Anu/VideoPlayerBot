@@ -21,7 +21,7 @@ async def play(client, m: Message):
     chat_id = m.chat.id
     media = m.reply_to_message
     if not media and not ' ' in m.text:
-        await msg.edit("❗ __Send Me An Live Radio Link / YouTube Video Link / Reply To An Audio To Start Audio Streaming!__")
+        await msg.edit("❗ __Send Me An Song Name / Live Radio Link / YouTube Video Link / Reply To An Audio To Start Audio Streaming!__")
 
     elif ' ' in m.text:
         text = m.text.split(' ', 1)
@@ -29,12 +29,22 @@ async def play(client, m: Message):
         regex = r"^(https?\:\/\/)?(www\.youtube\.com|youtu\.?be)\/.+"
         match = re.match(regex, query)
         if match:
+            await msg.edit("🔍 `Searching On YouTube ...`")
+            try:
+                search = VideosSearch(query, limit=1)
+                safone = search.result()["result"]
+                lmao = safone[0]["id"]
+                url = f"https://www.youtube.com/watch?v={lmao}"
+            except Exception as e:
+                await msg.edit(f"❌ **Found Literary Noting !** \nPlease Try Another Song or Use Correct Spelling!")
+                print(e)
+                return
             await msg.edit("🔄 `Starting YouTube Audio Stream ...`")
             try:
-                meta = ydl.extract_info(query, download=False)
+                meta = ydl.extract_info(url, download=False)
                 formats = meta.get('formats', [meta])
                 for f in formats:
-                        ytstreamlink = f['url']
+                    ytstreamlink = f['url']
                 link = ytstreamlink
             except Exception as e:
                 await msg.edit(f"❌ **YouTube Download Error !** \n\n`{e}`")
@@ -61,7 +71,7 @@ async def play(client, m: Message):
             await group_call.join(chat_id)
             await group_call.start_audio(link, repeat=False)
             AUDIO_CALL[chat_id] = group_call
-            await msg.edit(f"▶️ **Started [Audio Streaming]({query}) !**", disable_web_page_preview=True)
+            await msg.edit(f"▶️ **Started [Audio Streaming]({link}) In {m.chat.title} !**", disable_web_page_preview=True)
         except Exception as e:
             await msg.edit(f"❌ **An Error Occoured !** \n\nError: `{e}`")
 
@@ -86,7 +96,7 @@ async def play(client, m: Message):
             await group_call.join(chat_id)
             await group_call.start_audio(audio, repeat=False)
             AUDIO_CALL[chat_id] = group_call
-            await msg.edit(f"▶️ **Started [Audio Streaming](https://t.me/AsmSafone) !**", disable_web_page_preview=True)
+            await msg.edit(f"▶️ **Started [Audio Streaming](https://t.me/AsmSafone) In {m.chat.title} !**", disable_web_page_preview=True)
         except Exception as e:
             await msg.edit(f"❌ **An Error Occoured !** \n\nError: `{e}`")
 
